@@ -27,7 +27,8 @@ const App = () => {
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const {initialErrors} = utils;
   const [errors, setErrors] = useState(initialErrors);
-  const english = /^[A-Za-z0-9]*$/;
+  const english = /^[A-Za-z ]+$/;
+
 
   const handleClickOpen = () => {
     setOpen(true);
