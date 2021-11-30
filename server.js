@@ -1,39 +1,57 @@
-const {getUserData, updateUserData, deleteUser} = require('./be/getData');
+const {getWeatherData} = require('./be/weatherData/getData');
+const {updateWeatherData} = require('./be/weatherData/updateData');
+const {addWeatherData} = require('./be/weatherData/addData');
 const express = require('express'); 
-const { MongoClient } = require('mongodb');
 const app = express(); 
 const port = process.env.PORT || 5000;
-let userCollection;
+
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.listen(port, () => console.log(`Listening on port ${port}`));
 
-
-MongoClient.connect('mongodb+srv://natalie:d4d4d4d4@cluster0.9pp9b.mongodb.net/goals_db?retryWrites=true&w=majority', function (err, client) {
-  
-  if (err) throw err;
-
-  const db = client.db('goals_db');
-  userCollection = db.collection('goals');
-  
-  app.listen(port, () => console.log(`Listening on port ${port}`));
-
-})
 
 
 
 
 // get data
  app.get('/get_data', async (req, res) => { 
-  await getUserData('Natalie', userCollection, req, res);
+
+  try{
+    const {city} = req.query;
+    const weatherResponse = await getWeatherData(city, req, res);
+    console.log('weatherResponse', weatherResponse);
+
+    res.status(200).json({data: weatherResponse});
+  }catch(e){
+    res.status(500).json({error: e.toString()});
+  }
 }); 
+
 
 // update data
 app.post('/update_data', async (req, res) => { 
-  await updateUserData(userCollection, req, res);
+  try{
+    const weatherUpdateRes = await updateWeatherData(req, res);
+    console.log('weatherUpdateRes', weatherUpdateRes);
+    res.status(200).json({data: weatherUpdateRes});
+  }catch(e){
+    res.status(500).json({error: e.toString()});
+  }
 }); 
 
-// delete data
-app.post('/delete_data', async (req, res) => { 
-  await deleteUser(userCollection, req, res);
-});
+
+// add data
+app.post('/add_data', async (req, res) => { 
+  try{
+    const weatherAddRes = await addWeatherData(req, res);
+    console.log('weatherAddRes', weatherAddRes);
+    res.status(200).json({data: weatherAddRes});
+  }catch(e){
+    res.status(500).json({error: e.toString()});
+  }
+}); 
+
+
+
 
